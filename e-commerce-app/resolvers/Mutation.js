@@ -60,5 +60,26 @@ exports.Mutation = {
     const index = data.reviews.findIndex((r) => r.id === id);
     data.reviews.splice(index, 1);
     return true;
-  }
+  },
+
+  updateCategory: (parent, { id, input }, { data }) => {
+    const index = data.categories.findIndex((c) => c.id === id);
+    data.categories[index] = { ...data.categories[index], ...input }
+
+    return data.categories[index];
+  },
+
+  updateProduct: (parent, { id, input }, { data }) => {
+    const index = data.products.findIndex((c) => c.id === id);
+    data.products[index] = { ...data.products[index], ...input }
+
+    return data.products[index];
+  },
+
+  updateProduct: (parent, { id, input }, { data }) => {
+    const index = data.reviews.findIndex((c) => c.id === id);
+    data.reviews[index] = { ...data.reviews[index], ...input }
+
+    return data.reviews[index];
+  },
 }
