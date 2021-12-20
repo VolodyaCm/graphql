@@ -22,4 +22,5 @@ exports.Query = {
   product: (parent, { id }, { data }) => data.products.find(p => p.id === id),
   categories: (parent, args, { data }) => data.categories,
   category: (parent, { id }, { data }) => data.categories.find(p => p.id === id),
+  review: (parent, { id }, { data }) => data.reviews.find((r) => r.id === id),
 };

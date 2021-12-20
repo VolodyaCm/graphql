@@ -37,5 +37,28 @@ exports.Mutation = {
 
     data.reviews.push(newReview);
     return newReview;
+  },
+
+  deleteCategory: (parent, { id }, { data }) => {
+    const index = data.categories.findIndex((c) => c.id === id);
+    data.categories.splice(index, 1);
+    data.products.forEach((p) => {
+      if (p.categoryId === id) p.categoryId = null
+    });
+    return true;
+  },
+
+  deleteProduct: (parent, { id }, { data }) => {
+    const index = data.products.findIndex((c) => c.id === id);
+    const reviews = data.reviews.filter((r) => r.productId === id);
+    reviews.forEach((r) => data.reviews.slice(data.reviews.indexOf(r), 1));
+    data.products.splice(index, 1);
+    return true
+  },
+
+  deleteReview: (parent, { id }, { data }) => {
+    const index = data.reviews.findIndex((r) => r.id === id);
+    data.reviews.splice(index, 1);
+    return true;
   }
 }

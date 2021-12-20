@@ -7,12 +7,16 @@ exports.typeDefs = gql`
     product(id: String!): Product
     categories: [Category!]!
     category(id: String!): Category
+    review(id: ID!): Review
   }
 
   type Mutation {
     addCategory(input: AddCategoryInput!): Category!
     addProduct(input: AddProductInput!): Product!
     addReview(input: AddReviewInput!): Review!
+    deleteCategory(id: ID!): Boolean!
+    deleteProduct(id: ID!): Boolean!
+    deleteReview(id: ID!): Boolean!
   }
 
   type Product {
@@ -22,7 +26,7 @@ exports.typeDefs = gql`
     quantity: Float!
     onSale: Boolean!
     image: String!,
-    categoryId: String!,
+    categoryId: String,
     categories: [Category!]!
     reviews: [Review!]!
   }
