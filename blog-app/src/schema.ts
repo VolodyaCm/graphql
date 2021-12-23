@@ -2,11 +2,12 @@ import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
   type Query {
-    hello: String!
+    posts: [Post!]!
   }
 
   type Mutation {
-    postCreate(title: String!, content: String!): PostPayload!
+    postCreate(post: PostInput!): PostPayload!
+    postUpdate(postId: ID!, post: PostInput!): PostPayload!
   }
 
   type UserError {
@@ -18,6 +19,7 @@ export const typeDefs = gql`
     post: Post
   }
 
+  # Post Schema
   type Post {
     id: ID!
     title: String!
@@ -27,6 +29,12 @@ export const typeDefs = gql`
     user: User!
   }
 
+  input PostInput {
+    title: String
+    content: String
+  }
+
+  # User Schema
   type User {
     id: ID!
     name: String!
@@ -36,6 +44,7 @@ export const typeDefs = gql`
     posts: [Post!]!
   }
 
+  # Profile Schema
   type Profile {
     id: ID!
     bio: String!
