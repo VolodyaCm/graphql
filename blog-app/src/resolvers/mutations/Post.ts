@@ -11,6 +11,10 @@ type PostUpdateParams = (_:any, args: { postId: String, post: PostCreateArgsPara
   Promise<PostPayloadType>
 )
 
+type PostDeleteParams = (_:any, args: { postId: String }, context: Context) => (
+  Promise<PostPayloadType>
+)
+
 interface PostPayloadType {
   userErrors: UserErrors,
   post: Post | null
@@ -99,6 +103,28 @@ export const postUpdate: PostUpdateParams = async (parent, args, { prisma }) => 
     })
 
     return getPayload({ post });
+  } catch (error) {
+    console.error(error);
+    return getPayload({ userErrors: errorSmthWentWrong() })
+  }
+}
+
+// Post Delete
+export const postDelete: PostDeleteParams = async (parent, { postId }, { prisma }) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id: Number(postId) }
+    })
+
+    if (!post) {
+      return getPayload({ userErrors: errorNotExist() })
+    }
+
+    await prisma.post.delete({
+      where: { id: Number(postId) }
+    })
+
+    return getPayload({ post })
   } catch (error) {
     console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })

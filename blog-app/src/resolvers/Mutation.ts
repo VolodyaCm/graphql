@@ -1,6 +1,7 @@
-import { postCreate, postUpdate } from './mutations/Post';
+import { postCreate, postUpdate, postDelete } from './mutations/Post';
 
 export const Mutation = {
   postCreate,
   postUpdate,
+  postDelete,
 }
