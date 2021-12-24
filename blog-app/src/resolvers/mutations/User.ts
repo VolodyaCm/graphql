@@ -11,9 +11,14 @@ import {
   errorInvalidPasswordFormat,
   errorInvalidNameFormat,
   errorInvalidBio,
+  errorInvalidEmailPassword
 } from './helpers/errors';
 
 type UserCreateParams = (_:any, args: UserCreateArgsParam, context: Context) => (
+  Promise<PayloadType<User>>
+)
+
+type UserSigninType = (_:any, args: { email: string, password: string }, context: Context) => (
   Promise<PayloadType<User>>
 )
 
@@ -23,6 +28,14 @@ interface UserCreateArgsParam {
   password: string,
   bio: string
 }
+
+const getToken = (userId: string | number) => (
+  JWT.sign(
+    { userId: userId },
+    process.env.JWT_SIGNATURE || '',
+    { expiresIn: '1d' }
+  )
+)
 
 // User Create
 export const userCreate: UserCreateParams = async (parent, args, { prisma }) => {
@@ -52,13 +65,34 @@ export const userCreate: UserCreateParams = async (parent, args, { prisma }) => 
       data: { bio, userId: user.id }
     })
 
-    const token = JWT.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SIGNATURE || '',
-      { expiresIn: '1d' }
-    );
+    const token = getToken(user.id)
 
     return getPayload({ data: user, token });
+  } catch (error) {
+    console.error(error);
+    return getPayload({ userErrors: errorSmthWentWrong() })
+  }
+}
+
+export const signin: UserSigninType = async (parent, args, { prisma }) => {
+  try {
+    const { email, password } = args;
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return getPayload({ userErrors: errorInvalidEmailPassword() })
+    }
+
+    const isValidPassword = bcrypt.compareSync(password, user.password);
+
+    if (!isValidPassword) {
+      return getPayload({ userErrors: errorInvalidEmailPassword() })
+    }
+
+    const token = getToken(user.id);
+    return getPayload({ data: user, token })
   } catch (error) {
     console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })

@@ -8,8 +8,9 @@ export const typeDefs = gql`
   type Mutation {
     postCreate(post: PostInput!): PostPayload!
     postUpdate(postId: ID!, post: PostInput!): PostPayload!
-    postDelete(postId: ID!): PostPayload
-    userCreate(email: String!, name: String, password: String!, bio: String!): UserPayload
+    postDelete(postId: ID!): PostPayload!
+    userCreate(email: String!, name: String, password: String!, bio: String!): UserPayload!
+    signin(email: String!, password: String!): UserPayload
   }
 
   type UserError {
@@ -24,6 +25,7 @@ export const typeDefs = gql`
   type UserPayload {
     userErrors: [UserError!]!
     data: User
+    token: String
   }
 
   # Post Schema

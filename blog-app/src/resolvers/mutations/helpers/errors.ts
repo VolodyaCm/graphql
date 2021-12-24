@@ -29,3 +29,7 @@ export const errorInvalidNameFormat = (): UserErrors => (
 export const errorInvalidBio = (): UserErrors => (
   [{ message: 'Invalid bio' }]
 )
+
+export const errorInvalidEmailPassword = (): UserErrors => (
+  [{ message: 'Invalid user email or password' }]
+)
