@@ -9,6 +9,7 @@ export const typeDefs = gql`
     postCreate(post: PostInput!): PostPayload!
     postUpdate(postId: ID!, post: PostInput!): PostPayload!
     postDelete(postId: ID!): PostPayload
+    userCreate(email: String!, name: String, password: String!, bio: String!): UserPayload
   }
 
   type UserError {
@@ -18,6 +19,11 @@ export const typeDefs = gql`
   type PostPayload {
     userErrors: [UserError!]!
     post: Post
+  }
+
+  type UserPayload {
+    userErrors: [UserError!]!
+    data: User
   }
 
   # Post Schema
