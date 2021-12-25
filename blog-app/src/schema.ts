@@ -26,6 +26,11 @@ export const typeDefs = gql`
     post: Post
   }
 
+  type PostsPayload {
+    userErrors: [UserError!]!
+    data: [Post!]!
+  }
+
   type UserPayload {
     userErrors: [UserError!]!
     data: User
@@ -59,7 +64,7 @@ export const typeDefs = gql`
     name: String!
     email: String!
     createdAt: String!
-    posts: [Post!]!
+    posts: PostsPayload
   }
 
   # Profile Schema

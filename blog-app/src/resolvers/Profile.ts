@@ -1,9 +1,9 @@
-import { Context } from '../..';
+import { Context } from '..';
 import { User } from '.prisma/client';
-import { GetPayload, PayloadType } from '../mutations/helpers/getPayload';
+import { GetPayload, PayloadType } from './mutations/helpers/getPayload';
 import {
   errorSmthWentWrong,
-} from '../mutations/helpers/errors';
+} from './mutations/helpers/errors';
 
 interface ProfileParentType {
   id: string;
@@ -28,6 +28,7 @@ export const user: UserProfile = async (parent, args, context) => {
     const { prisma } = context;
     const { userId } = parent;
 
+    console.log('FROM PRIFILE USRR')
     const user = await prisma.user.findUnique({
       where: { id: userId }
     });
