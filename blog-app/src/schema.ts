@@ -9,6 +9,8 @@ export const typeDefs = gql`
     postCreate(post: PostInput!): PostPayload!
     postUpdate(postId: String!, post: PostInput!): PostPayload!
     postDelete(postId: String!): PostPayload!
+    postPublish(postId: String!): PostPayload!
+    postUnpublish(postId: String!): PostPayload!
     userCreate(email: String!, name: String, password: String!, bio: String!): UserPayload!
     signin(email: String!, password: String!): UserPayload
   }

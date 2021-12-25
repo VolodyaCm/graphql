@@ -18,6 +18,10 @@ type PostDeleteParams = (_:any, args: { postId: string }, context: Context) => (
   Promise<PayloadType<Post>>
 )
 
+type PostPublishParams = (_:any, args: { postId: string }, context: Context) => (
+  Promise<PayloadType<Post>>
+)
+
 interface PostCreateArgsParam {
   post: {
     title: string,
@@ -155,6 +159,64 @@ export const postDelete: PostDeleteParams = async (parent, { postId }, context) 
 
     await prisma.post.delete({
       where: { id: postId }
+    })
+
+    return getPayload({ data: post })
+  } catch (error) {
+    console.error(error);
+    return getPayload({ userErrors: errorSmthWentWrong() })
+  }
+}
+
+export const postPublish: PostPublishParams = async (parent, args, context) => {
+  try {
+    const { prisma, userInfo } = context;
+    const { postId } = args;
+
+    if (!userInfo) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
+
+    const canMutate = await canUserMutatePost({
+      userId: userInfo.userId,
+      postId: postId,
+      prisma,
+    });
+
+    if (canMutate) return canMutate;
+
+    const post = await prisma.post.update({
+      where: { id: postId },
+      data: { published: true },
+    })
+
+    return getPayload({ data: post })
+  } catch (error) {
+    console.error(error);
+    return getPayload({ userErrors: errorSmthWentWrong() })
+  }
+}
+
+export const unpostPublish: PostPublishParams = async (parent, args, context) => {
+  try {
+    const { prisma, userInfo } = context;
+    const { postId } = args;
+
+    if (!userInfo) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
+
+    const canMutate = await canUserMutatePost({
+      userId: userInfo.userId,
+      postId: postId,
+      prisma,
+    });
+
+    if (canMutate) return canMutate;
+
+    const post = await prisma.post.update({
+      where: { id: postId },
+      data: { published: false },
     })
 
     return getPayload({ data: post })
