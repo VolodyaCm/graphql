@@ -197,7 +197,7 @@ export const postPublish: PostPublishParams = async (parent, args, context) => {
   }
 }
 
-export const unpostPublish: PostPublishParams = async (parent, args, context) => {
+export const postUnpublish: PostPublishParams = async (parent, args, context) => {
   try {
     const { prisma, userInfo } = context;
     const { postId } = args;
@@ -217,7 +217,8 @@ export const unpostPublish: PostPublishParams = async (parent, args, context) =>
     const post = await prisma.post.update({
       where: { id: postId },
       data: { published: false },
-    })
+    });
+    throw new Error('Fuck');
 
     return getPayload({ data: post })
   } catch (error) {

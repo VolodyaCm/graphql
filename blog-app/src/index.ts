@@ -24,8 +24,6 @@ const server = new ApolloServer({
     Mutation,
   },
   context: async ({ req }: any): Promise<Context> => {
-    debugger;
-    console.log('ORIGINAL URL', req.originalUrl);
     const userInfo = getUserFromToken(req.headers.authorization)
     return {
       prisma,

@@ -11,7 +11,8 @@ import {
   errorInvalidPasswordFormat,
   errorInvalidNameFormat,
   errorInvalidBio,
-  errorInvalidEmailPassword
+  errorInvalidEmailPassword,
+  errorForbiddeAccess,
 } from './helpers/errors';
 
 const getPayload: GetPayload<User> = (opt) => {

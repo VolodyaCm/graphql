@@ -1,4 +1,5 @@
 import { Context } from '..';
+import { me } from './queries/User';
 
 export const Query = {
   posts: async (_:any, __:any, { prisma }: Context) => {
@@ -11,5 +12,6 @@ export const Query = {
       console.error(error);
       return error;
     }
-  }
+  },
+  me,
 }
