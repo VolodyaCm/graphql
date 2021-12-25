@@ -2,8 +2,8 @@ import validator from 'validator';
 import JWT from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { Context } from '../../index';
-import { User } from '.prisma/client';
-import { getPayload, PayloadType } from './helpers/getPayload';
+import { User, Post } from '.prisma/client';
+import { GetPayload, PayloadType } from './helpers/getPayload';
 import {
   errorSmthWentWrong,
   errorNotExist,
@@ -13,6 +13,11 @@ import {
   errorInvalidBio,
   errorInvalidEmailPassword
 } from './helpers/errors';
+
+const getPayload: GetPayload<User> = (opt) => {
+  const { userErrors = [], data = null, token = null } = opt;
+  return { userErrors, data, token }
+}
 
 type UserCreateParams = (_:any, args: UserCreateArgsParam, context: Context) => (
   Promise<PayloadType<User>>
@@ -29,7 +34,7 @@ interface UserCreateArgsParam {
   bio: string
 }
 
-const getToken = (userId: string | number) => (
+const getToken = (userId: string ) => (
   JWT.sign(
     { userId: userId },
     process.env.JWT_SIGNATURE || '',
@@ -92,6 +97,7 @@ export const signin: UserSigninType = async (parent, args, { prisma }) => {
     }
 
     const token = getToken(user.id);
+
     return getPayload({ data: user, token })
   } catch (error) {
     console.error(error);

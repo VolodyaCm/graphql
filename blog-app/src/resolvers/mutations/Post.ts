@@ -1,29 +1,22 @@
 import { Context } from '../../index';
 import { Post } from '.prisma/client';
+import { errorForbiddeAccess } from './helpers/errors';
+import { canUserMutatePost } from './helpers/canUserMutatePost';
+import { GetPayload, PayloadType } from './helpers/getPayload';
 
 type UserErrors = { message: String }[];
 
 type PostCreateParams = (_:any, args: PostCreateArgsParam, context: Context) => (
-  Promise<PostPayloadType>
+  Promise<PayloadType<Post>>
 )
 
-type PostUpdateParams = (_:any, args: { postId: String, post: PostCreateArgsParam['post'] }, context: Context) => (
-  Promise<PostPayloadType>
+type PostUpdateParams = (_:any, args: { postId: string, post: PostCreateArgsParam['post'] }, context: Context) => (
+  Promise<PayloadType<Post>>
 )
 
-type PostDeleteParams = (_:any, args: { postId: String }, context: Context) => (
-  Promise<PostPayloadType>
+type PostDeleteParams = (_:any, args: { postId: string }, context: Context) => (
+  Promise<PayloadType<Post>>
 )
-
-interface PostPayloadType {
-  userErrors: UserErrors,
-  post: Post | null
-}
-
-interface GetPayloadArgs {
-  userErrors?: UserErrors,
-  post?: Post | null
-}
 
 interface PostCreateArgsParam {
   post: {
@@ -32,9 +25,9 @@ interface PostCreateArgsParam {
   }
 }
 
-const getPayload = (opt: GetPayloadArgs): PostPayloadType => {
-  const { userErrors = [], post = null } = opt;
-  return { userErrors, post }
+const getPayload: GetPayload<Post> = (opt) => {
+  const { userErrors = [], data = null, token = null } = opt;
+  return { userErrors, data, token }
 }
 
 const errorTitleContent = (): UserErrors => (
@@ -50,19 +43,32 @@ const errorNotExist = (): UserErrors => (
 )
 
 // Post Create
-export const postCreate: PostCreateParams = async (parent, args, { prisma }) => {
+export const postCreate: PostCreateParams = async (parent, args, context) => {
   try {
+    const { prisma, userInfo} = context;
     const { title, content } = args.post;
+
+    if (!userInfo?.userId) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userInfo?.userId }
+    })
+
+    if (!user) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
 
     if (!title || !content) {
       return getPayload({ userErrors: errorTitleContent() });
     }
 
     const post = await prisma.post.create({
-      data: { title, content, authorId: 1 }
+      data: { title, content, authorId: userInfo.userId }
     });
 
-    return getPayload({ post });
+    return getPayload({ data: post });
   } catch (error) {
     console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })
@@ -70,17 +76,30 @@ export const postCreate: PostCreateParams = async (parent, args, { prisma }) => 
 };
 
 // Post Update
-export const postUpdate: PostUpdateParams = async (parent, args, { prisma }) => {
+export const postUpdate: PostUpdateParams = async (parent, args, context) => {
   try {
+    const { prisma, userInfo } = context;
     const { title, content } = args.post;
     const { postId } = args;
+
+    if (!userInfo) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
+
+    const canMutate = await canUserMutatePost({
+      userId: userInfo.userId,
+      postId: postId,
+      prisma,
+    });
+
+    if (canMutate) return canMutate;
 
     if (!title && !content) {
       return getPayload({ userErrors: errorTitleContent() });
     }
 
     const existingPost = await prisma.post.findUnique({
-      where: { id: Number(postId) }
+      where: { id: postId }
     });
 
     if (!existingPost) {
@@ -99,10 +118,10 @@ export const postUpdate: PostUpdateParams = async (parent, args, { prisma }) => 
 
     const post = await prisma.post.update({
       data: { ...payloadToUpdate },
-      where: { id: Number(postId) },
+      where: { id: postId },
     })
 
-    return getPayload({ post });
+    return getPayload({ data: post });
   } catch (error) {
     console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })
@@ -110,10 +129,24 @@ export const postUpdate: PostUpdateParams = async (parent, args, { prisma }) => 
 }
 
 // Post Delete
-export const postDelete: PostDeleteParams = async (parent, { postId }, { prisma }) => {
+export const postDelete: PostDeleteParams = async (parent, { postId }, context) => {
   try {
+    const { prisma, userInfo } = context;
+
+    if (!userInfo) {
+      return getPayload({ userErrors: errorForbiddeAccess() })
+    }
+
+    const canMutate = await canUserMutatePost({
+      userId: userInfo.userId,
+      postId: postId,
+      prisma,
+    });
+
+    if (canMutate) return canMutate;
+
     const post = await prisma.post.findUnique({
-      where: { id: Number(postId) }
+      where: { id: postId }
     })
 
     if (!post) {
@@ -121,10 +154,10 @@ export const postDelete: PostDeleteParams = async (parent, { postId }, { prisma 
     }
 
     await prisma.post.delete({
-      where: { id: Number(postId) }
+      where: { id: postId }
     })
 
-    return getPayload({ post })
+    return getPayload({ data: post })
   } catch (error) {
     console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })

@@ -7,8 +7,8 @@ export const typeDefs = gql`
 
   type Mutation {
     postCreate(post: PostInput!): PostPayload!
-    postUpdate(postId: ID!, post: PostInput!): PostPayload!
-    postDelete(postId: ID!): PostPayload!
+    postUpdate(postId: String!, post: PostInput!): PostPayload!
+    postDelete(postId: String!): PostPayload!
     userCreate(email: String!, name: String, password: String!, bio: String!): UserPayload!
     signin(email: String!, password: String!): UserPayload
   }
@@ -30,7 +30,7 @@ export const typeDefs = gql`
 
   # Post Schema
   type Post {
-    id: ID!
+    id: String!
     title: String!
     content: String!
     createdAt: String!
@@ -45,7 +45,7 @@ export const typeDefs = gql`
 
   # User Schema
   type User {
-    id: ID!
+    id: String!
     name: String!
     email: String!
     createdAt: String!
@@ -55,7 +55,7 @@ export const typeDefs = gql`
 
   # Profile Schema
   type Profile {
-    id: ID!
+    id: String!
     bio: String!
     user: User!
   }

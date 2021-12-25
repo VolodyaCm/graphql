@@ -8,9 +8,9 @@ export interface PayloadType<T> {
   token?: string | null,
 }
 
-type GetPayload<T> = (opt: PayloadType<T>) => PayloadType<T>
+export type GetPayload<T> = (opt: PayloadType<T>) => PayloadType<T>
 
 export const getPayload: GetPayload<User> = (opt) => {
-  const { userErrors = [], data = null } = opt;
-  return { userErrors, data }
+  const { userErrors = [], data = null, token = null } = opt;
+  return { userErrors, data, token }
 }

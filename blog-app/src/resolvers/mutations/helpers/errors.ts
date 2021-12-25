@@ -33,3 +33,7 @@ export const errorInvalidBio = (): UserErrors => (
 export const errorInvalidEmailPassword = (): UserErrors => (
   [{ message: 'Invalid user email or password' }]
 )
+
+export const errorForbiddeAccess = (): UserErrors => (
+  [{ message: 'Forbidden access (unauthenticated)' }]
+)
