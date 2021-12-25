@@ -1,16 +1,22 @@
 import { Context } from '../..';
-import { User } from '.prisma/client';
+import { User, Profile } from '.prisma/client';
 import { GetPayload, PayloadType } from '../mutations/helpers/getPayload';
 import {
   errorForbiddeAccess,
   errorSmthWentWrong,
 } from '../mutations/helpers/errors';
 
+type Related = User | Profile;
+
 type UserMe = (_:any, args: any, context: Context) => (
-  Promise<PayloadType<User>>
+  Promise<PayloadType<Related>>
 )
 
-const getPayload: GetPayload<User> = (opt) => {
+type UserProfile = (_:any, args: { userId: string }, context: Context) => (
+  Promise<PayloadType<Related>>
+)
+
+export const getPayload: GetPayload<Related> = (opt) => {
   const { userErrors = [], data = null, token = null } = opt;
   return { userErrors, data, token }
 }
@@ -29,7 +35,23 @@ export const me: UserMe = async (parent, args, context) => {
 
     return getPayload({ data: user });
   } catch (error) {
-    console.error('FUNCK');
+    console.error(error);
+    return getPayload({ userErrors: errorSmthWentWrong() })
+  }
+}
+
+export const profile: UserProfile = async (parent, args, context) => {
+  try {
+    const { prisma } = context;
+    const { userId } = args;
+
+    const profile = await prisma.profile.findUnique({
+      where: { userId }
+    });
+
+    return getPayload({ data: profile });
+  } catch (error) {
+    console.error(error);
     return getPayload({ userErrors: errorSmthWentWrong() })
   }
 }

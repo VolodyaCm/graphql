@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type Query {
     posts: [Post!]!
     me: UserPayload
+    profile(userId: String!): ProfilePayload
   }
 
   type Mutation {
@@ -31,6 +32,12 @@ export const typeDefs = gql`
     token: String
   }
 
+  type ProfilePayload {
+    userErrors: [UserError!]!
+    data: Profile
+    token: String
+  }
+
   # Post Schema
   type Post {
     id: String!
@@ -52,7 +59,6 @@ export const typeDefs = gql`
     name: String!
     email: String!
     createdAt: String!
-    profile: Profile!
     posts: [Post!]!
   }
 
@@ -60,6 +66,6 @@ export const typeDefs = gql`
   type Profile {
     id: String!
     bio: String!
-    user: User!
+    user: UserPayload!
   }
 `
