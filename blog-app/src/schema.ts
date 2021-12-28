@@ -50,7 +50,7 @@ export const typeDefs = gql`
     content: String!
     createdAt: String!
     published: Boolean!
-    user: User!
+    user: UserPayload!
   }
 
   input PostInput {

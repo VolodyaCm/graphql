@@ -16,7 +16,7 @@ type UserProfile = (_:any, args: { userId: string }, context: Context) => (
   Promise<PayloadType<Related>>
 )
 
-export const getPayload: GetPayload<Related> = (opt) => {
+const getPayload: GetPayload<Related> = (opt) => {
   const { userErrors = [], data = null, token = null } = opt;
   return { userErrors, data, token }
 }
