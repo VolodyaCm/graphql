@@ -23,7 +23,7 @@ export const typeDefs = gql`
 
   type PostPayload {
     userErrors: [UserError!]!
-    post: Post
+    data: Post
   }
 
   type PostsPayload {

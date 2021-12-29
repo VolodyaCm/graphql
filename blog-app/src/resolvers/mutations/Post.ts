@@ -10,7 +10,7 @@ type PostCreateParams = (_:any, args: PostCreateArgsParam, context: Context) => 
   Promise<PayloadType<Post>>
 )
 
-type PostUpdateParams = (_:any, args: { postId: string, post: PostCreateArgsParam['post'] }, context: Context) => (
+type PostUpdateParams = (_:any, args: { postId: string, post: Post }, context: Context) => (
   Promise<PayloadType<Post>>
 )
 
@@ -52,6 +52,8 @@ export const postCreate: PostCreateParams = async (parent, args, context) => {
     const { prisma, userInfo} = context;
     const { title, content } = args.post;
 
+    console.log('POST', userInfo);
+
     if (!userInfo?.userId) {
       return getPayload({ userErrors: errorForbiddeAccess() })
     }
@@ -71,6 +73,8 @@ export const postCreate: PostCreateParams = async (parent, args, context) => {
     const post = await prisma.post.create({
       data: { title, content, authorId: userInfo.userId }
     });
+
+    console.log('POST', post);
 
     return getPayload({ data: post });
   } catch (error) {
