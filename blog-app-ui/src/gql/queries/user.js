@@ -9,3 +9,14 @@ export const USER_CREATE = gql`
     }
   }
 `
+
+export const SIGNIN = gql`
+  mutation($email: String!, $password: String!) {
+    signin(email: $email, password: $password) {
+      token
+      userErrors {
+        message
+      }
+    }
+  }
+`

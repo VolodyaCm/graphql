@@ -49,11 +49,6 @@ const importPosts = async (data = []) => {
         }
       });
     });
-
-    console.log('done')
-
-    // const j = await data.json();
-    // console.log(JSON.stringify(j));
   } catch (error) {
     console.error(error);
   }
